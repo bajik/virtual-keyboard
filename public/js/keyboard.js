@@ -19,15 +19,19 @@ export class Keyboard {
   };
 
   #init() {
-    const elComp = utils.createElementWithAttributes('div', 'comp');     
-    elComp.appendChild(this.#getMonitor());
-    elComp.appendChild(this.#renderKeyboard());
-    
-    this.#state.container.appendChild(elComp);
+    this.#renderComp();
     console.log(this.#state);
   }
 
-  #getMonitor() {
+  #renderComp() {
+    const elComp = utils.createElementWithAttributes('div', 'comp');     
+    elComp.appendChild(this.#renderMonitor());
+    elComp.appendChild(this.#renderKeyboard());
+    
+    this.#state.container.appendChild(elComp);
+  }
+
+  #renderMonitor() {
     const elMonitor = utils.createElementWithAttributes('div', 'monitor');
     const elMonitorScreen = utils.createElementWithAttributes('div', 'monitor__screen');
     const elWinEditor = utils.createElementWithAttributes('textarea', 'win_editor', { id: 'win_editor'});
