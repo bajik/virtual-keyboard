@@ -1,3 +1,6 @@
-import * as utils from './utils.js';
+import { Keyboard } from './keyboard.js';
 
-console.log(utils.createElement('button', 'keyboard__key', {'data-code': 'ghgh'}));
+const page = document.querySelector('.page');
+
+console.log(page);
+const kbt = new Keyboard(page);
