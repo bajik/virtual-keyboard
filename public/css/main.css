@@ -96,7 +96,7 @@
   /* transition:all 0.3s ease; */
 }
 
-.keyboard__key:active::before {
+.keyboard__key--active::before {
   top: -1.5px;
   width: 100%;
   box-shadow:2px 0px 15px rgba(0,255,0,1);
@@ -106,7 +106,7 @@
   flex-grow: 1;
 }
 
-.keyboard__key:active{
+.keyboard__key--active{
   top: 3px;
 }
 

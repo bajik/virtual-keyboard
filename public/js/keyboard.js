@@ -20,7 +20,24 @@ export class Keyboard {
 
   #init() {
     this.#renderComp();
+    this.#attachEvents();
+
+    this.#state.keyCapsLock = this.#state.container.querySelector(`.keyboard__key[data-code="CapsLock"]`);
+
     console.log(this.#state);
+  }
+
+  #attachEvents() {
+    this.#state.container.addEventListener("keydown", this.#handleKeyPressEvent.bind(this, true));
+    this.#state.container.addEventListener("keyup", this.#handleKeyPressEvent.bind(this, false));
+    window.addEventListener("focus", this.#removeActiveClassFromKeys.bind(this));
+  }
+  
+  #removeActiveClassFromKeys() {
+    const keys = this.#state.container.querySelectorAll('.keyboard__key[data-code]:not([data-code="CapsLock"])');
+    keys.forEach(key => {
+      key.classList.remove('keyboard__key--active');
+    });
   }
 
   #renderComp() {
@@ -102,6 +119,85 @@ export class Keyboard {
     return fetch(`./lang/${lang}.json`).then((response) => {
       return response.json();
     });
+  }
+
+  #handleKeyPressEvent(isActive) {
+
+    console.log(event);
+
+    this.#updateModifierKeys(event.altKey, event.ctrlKey, event.shiftKey);
+
+    if (event.code === "AltLeft" || event.code === "AltRight") {
+      event.preventDefault();
+    }
+  
+    if (event.code === "CapsLock") {
+      this.#checkCapsLockOnKeyPress(event);
+      return;
+    }
+      
+    const key = this.#state.container.querySelector(`.keyboard__key[data-code="${event.code}"]`);  
+    if (!key) return; 
+  
+    if (isActive) {
+      if (!key.classList.contains('keyboard__key--active')) {
+        key.classList.add('keyboard__key--active');    
+      }
+    } else {
+      key.classList.remove('keyboard__key--active');
+    }
+  }
+
+  #checkCapsLockOnKeyPress(event) { 
+    const isCapsLockActive = event.getModifierState('CapsLock');
+    const keyCapsLock = this.#state.keyCapsLock;
+    
+    if (isCapsLockActive !== this.#state.isCapsLockActive) {
+      this.#state.isCapsLockActive = isCapsLockActive;
+      
+      if (isCapsLockActive) {
+        keyCapsLock.classList.add('keyboard__key--active');
+      } else {
+        keyCapsLock.classList.remove('keyboard__key--active');
+      }
+
+      this.#updateLevelKeyboard();
+    }
+  }
+
+  #updateModifierKeys(altKey, ctrlKey, shiftKey) {
+    let isChange = false;
+    
+    if (this.#state.altKey !== altKey) {
+      this.#state.altKey = altKey;
+      isChange = true;
+    }
+    if (this.#state.ctrlKey !== ctrlKey) {
+      this.#state.ctrlKey = ctrlKey;
+      isChange = true;
+    }
+    if (this.#state.shiftKey !== shiftKey) {
+      this.#state.shiftKey = shiftKey;
+      isChange = true;
+    }
+    if (isChange) {
+      this.#updateLevelKeyboard();
+    }     
+  }
+
+  #updateLevelKeyboard() {
+    let newLevelKey = 1;
+  
+    if (this.#state.altKey && this.#state.ctrlKey) {
+      newLevelKey = this.#state.shiftKey ? 4 : 3;
+    } else if (this.#state.shiftKey  && !this.#state.isCapsLockActive || !this.#state.shiftKey  && this.#state.isCapsLockActive) {
+      newLevelKey = 2
+    }
+
+    if (this.#state.levelKey !== newLevelKey) {
+      this.#state.levelKey = newLevelKey;
+    }
+    // this.#updateKeyboardKeysText();
   }
 
 }
