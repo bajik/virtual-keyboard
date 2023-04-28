@@ -21,7 +21,7 @@ export class Keyboard {
   #init() {
     const elComp = utils.createElementWithAttributes('div', 'comp');     
     elComp.appendChild(this.#getMonitor());
-    elComp.appendChild(this.#getKeyboard());
+    elComp.appendChild(this.#renderKeyboard());
     
     this.#state.container.appendChild(elComp);
     console.log(this.#state);
@@ -37,46 +37,61 @@ export class Keyboard {
     return elMonitor;
   }
 
-  #getKeyboard() {
+  #renderKeyboard() {
     const elKeyboard = utils.createElementWithAttributes('div', 'keyboard');
-       
-    this.#state.keybordInfo.keys.sort((a, b) => {
-      if (a.row === b.row) {
-        return a.pos - b.pos;
-      }
-      return a.row - b.row;
-    });
-
+      
+    this.#sortKeys();
+    
     let curentRow = 0;
     let elRowKeys;
-    
+
     this.#state.keybordInfo.keys.forEach(btn => {           
       if (curentRow !== btn.row) {
         if (curentRow > 0) {
           elKeyboard.appendChild(elRowKeys);
         }
         curentRow = btn.row;
-        elRowKeys = utils.createElementWithAttributes('div', 'keyboard__row');
+        elRowKeys = this.#createKeyboardRow(btn);
+      } else {
+        const elKey = this.#createKeyButton(btn);
+        elRowKeys.appendChild(elKey);
       }
-      const elKey = utils.createElementWithAttributes('button', 'keyboard__key', {'data-code': btn.code})
-      if (btn.level_1) {
-        elKey.textContent = btn.level_1;
-      }
-      if (btn.title) {
-        elKey.textContent = btn.title;
-      }
-      if (btn.style) {
-        elKey.setAttribute('style', btn.style);
-      }
-      
-      elRowKeys.appendChild(elKey);
     });
-    
+
     if (curentRow > 0) {
       elKeyboard.appendChild(elRowKeys);
-    }
-   
+    }   
     return elKeyboard;
+  }
+
+  #createKeyButton(btn) {
+    const elKey = utils.createElementWithAttributes('button', 'keyboard__key', {'data-code': btn.code})
+    if (btn.level_1) {
+      elKey.textContent = btn.level_1;
+    }
+    if (btn.title) {
+      elKey.textContent = btn.title;
+    }
+    if (btn.style) {
+      elKey.setAttribute('style', btn.style);
+    }
+    return elKey;
+  }
+
+  #createKeyboardRow(btn) {
+    const elRowKeys = utils.createElementWithAttributes('div', 'keyboard__row');
+    const elKey = this.#createKeyButton(btn);
+    elRowKeys.appendChild(elKey);
+    return elRowKeys;
+  }
+
+  #sortKeys() {
+    this.#state.keybordInfo.keys.sort((a, b) => {
+      if (a.row === b.row) {
+        return a.pos - b.pos;
+      }
+      return a.row - b.row;
+    });
   }
 
   #getKeyboardInfo(lang) {
