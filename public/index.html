@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./css/main.css">
+  <title>Virtual keyboard</title>
+</head>
+<body>
+  <div class="monitor">
+    <div class="monitor__screen">
+      <textarea class="win_editor" name="win_editor" id="" cols="30" rows="10"></textarea>
+    </div>
+  </div>
+  
+  <div class="keyboard">
+    <div class="keyboard__row">
+      <button class="keyboard__key" data-code="Backquote">`</button>
+      <button class="keyboard__key" data-code="Digit1">1</button>
+      <button class="keyboard__key" data-code="Digit2">2</button>
+      <button class="keyboard__key" data-code="Digit3">3</button>
+      <button class="keyboard__key" data-code="Digit4">4</button>
+      <button class="keyboard__key" data-code="Digit5">5</button>
+      <button class="keyboard__key" data-code="Digit6">6</button>
+      <button class="keyboard__key" data-code="Digit7">7</button>
+      <button class="keyboard__key" data-code="Digit8">8</button>
+      <button class="keyboard__key" data-code="Digit9">9</button>
+      <button class="keyboard__key" data-code="Digit0">0</button>
+      <button class="keyboard__key" data-code="Minus">-</button>
+      <button class="keyboard__key" data-code="Equal">=</button>
+      <button class="keyboard__key keyboard__key--grow" data-code="Backspace">&#x21D0;</button>
+    </div>
+    <div class="keyboard__row">
+      <button class="keyboard__key" data-code="Tab" style="width: 3.9rem">Tab</button>
+      <button class="keyboard__key" data-code="KeyQ">q</button>
+      <button class="keyboard__key" data-code="KeyW">w</button>
+      <button class="keyboard__key" data-code="KeyE">e</button>
+      <button class="keyboard__key" data-code="KeyR">r</button>
+      <button class="keyboard__key" data-code="KeyT">t</button>
+      <button class="keyboard__key" data-code="KeyY">y</button>
+      <button class="keyboard__key" data-code="KeyU">u</button>
+      <button class="keyboard__key" data-code="KeyI">i</button>
+      <button class="keyboard__key" data-code="KeyO">o</button>
+      <button class="keyboard__key" data-code="KeyP">p</button>
+      <button class="keyboard__key" data-code="BracketLeft">{</button>
+      <button class="keyboard__key" data-code="BracketRight">}</button>
+      <button class="keyboard__key keyboard__key--grow" data-code="Backslash">\</button>
+    </div>
+    <div class="keyboard__row">
+      <button class="keyboard__key" data-code="CapsLock" style="width: 4.5rem">Caps</button>
+      <button class="keyboard__key" data-code="KeyA">a</button>
+      <button class="keyboard__key" data-code="KeyS">s</button>
+      <button class="keyboard__key" data-code="KeyD">d</button>
+      <button class="keyboard__key" data-code="KeyF">f</button>
+      <button class="keyboard__key" data-code="KeyG">g</button>
+      <button class="keyboard__key" data-code="KeyH">h</button>
+      <button class="keyboard__key" data-code="KeyJ">j</button>
+      <button class="keyboard__key" data-code="KeyK">k</button>
+      <button class="keyboard__key" data-code="KeyL">l</button>
+      <button class="keyboard__key" data-code="Semicolon">;</button>
+      <button class="keyboard__key" data-code="Quote">'</button>
+      <button class="keyboard__key keyboard__key--grow" data-code="Enter">Enter</button>
+    </div>
+    <div class="keyboard__row">
+      <button class="keyboard__key" data-code="ShiftLeft" style="width: 6rem; text-align: left;">&#8657;</button>
+      <button class="keyboard__key" data-code="KeyZ">z</button>
+      <button class="keyboard__key" data-code="KeyX">x</button>
+      <button class="keyboard__key" data-code="KeyC">c</button>
+      <button class="keyboard__key" data-code="KeyV">v</button>
+      <button class="keyboard__key" data-code="KeyB">b</button>
+      <button class="keyboard__key" data-code="KeyN">n</button>
+      <button class="keyboard__key" data-code="KeyM">m</button>
+      <button class="keyboard__key" data-code="Comma">,</button>
+      <button class="keyboard__key" data-code="Period">.</button>
+      <button class="keyboard__key" data-code="Slash">/</button>
+      <button class="keyboard__key" data-code="ArrowUp">&#8593;</button>
+      <button class="keyboard__key" style="width: 6.35rem; text-align: left" data-code="ShiftRight">&#8657;</button>
+    </div>
+    <div class="keyboard__row">
+      <button class="keyboard__key" data-code="ControlLeft">Ctrl</button>
+      <button class="keyboard__key" data-code="MetaLeft">⌘</button>      
+      <!-- <button class="keyboard__key">⌘⊞</button>       -->
+      <button class="keyboard__key" data-code="AltLeft">Alt</button>
+      <!-- <button class="keyboard__key" data-code="">&#127758;</button> -->
+      <button class="keyboard__key keyboard__key--grow" data-code="Space"></button>
+      <button class="keyboard__key" data-code="AltRight">Alt</button>
+      <button class="keyboard__key" data-code="ArrowLeft">&#8592;</button>
+      <button class="keyboard__key" data-code="ArrowDown">&#8595;</button>
+      <button class="keyboard__key" data-code="ArrowRight">&#8594;</button>
+      <button class="keyboard__key" data-code="ControlRight">Ctrl</button>
+    </div>
+  </div>
+
+  <script src="./js/main.js"></script>
+</body>
+</html>
