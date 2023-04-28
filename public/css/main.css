@@ -59,11 +59,9 @@
   margin: 2rem auto 0;
   padding: 1.5rem 1rem 1rem;
   border: 2px solid black;
-  border-radius: 0.5rem;  
+  border-radius: 0.5rem;
   transform: perspective(1000px) rotateX(40deg);
 }
-
-
 
 .keyboard__row {
   display: flex;
