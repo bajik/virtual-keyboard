@@ -1,7 +1,7 @@
 import * as utils from './utils.js';
 
 export class Keyboard {
-  
+
   #state
 
   constructor(container) {
@@ -9,10 +9,10 @@ export class Keyboard {
 
     this.#getKeyboardInfo('ua-unicode').then((keybordInfo) => {
       this.#state = {
-        container: container, 
+        container: container,
         keybordInfo: keybordInfo
       };
-  
+
       this.#init();
     });
   };
@@ -31,7 +31,7 @@ export class Keyboard {
     this.#state.container.addEventListener("keyup", this.#handleKeyPressEvent.bind(this, false));
     window.addEventListener("focus", this.#removeActiveClassFromKeys.bind(this));
   }
-  
+
   #removeActiveClassFromKeys() {
     const keys = this.#state.container.querySelectorAll('.keyboard__key[data-code]:not([data-code="CapsLock"])');
     keys.forEach(key => {
@@ -40,10 +40,10 @@ export class Keyboard {
   }
 
   #renderComp() {
-    const elComp = utils.createElementWithAttributes('div', 'comp');     
+    const elComp = utils.createElementWithAttributes('div', 'comp');
     elComp.appendChild(this.#renderMonitor());
     elComp.appendChild(this.#renderKeyboard());
-    
+
     this.#state.container.appendChild(elComp);
   }
 
@@ -59,13 +59,11 @@ export class Keyboard {
 
   #renderKeyboard() {
     const elKeyboard = utils.createElementWithAttributes('div', 'keyboard');
-      
     this.#sortKeys();
-    
     let curentRow = 0;
     let elRowKeys;
 
-    this.#state.keybordInfo.keys.forEach(btn => {           
+    this.#state.keybordInfo.keys.forEach(btn => {
       if (curentRow !== btn.row) {
         if (curentRow > 0) {
           elKeyboard.appendChild(elRowKeys);
@@ -80,7 +78,7 @@ export class Keyboard {
 
     if (curentRow > 0) {
       elKeyboard.appendChild(elRowKeys);
-    }   
+    }
     return elKeyboard;
   }
 
@@ -127,31 +125,30 @@ export class Keyboard {
     if (event.code === "AltLeft" || event.code === "AltRight") {
       event.preventDefault();
     }
-  
-    if (event.code === "CapsLock") {
-      this.#checkCapsLockOnKeyPress(event);
-      return;
-    }
-      
-    const key = this.#state.container.querySelector(`.keyboard__key[data-code="${event.code}"]`);  
-    if (!key) return; 
-  
+
+    this.#checkCapsLockOnKeyPress(event);
+    if (event.code === "CapsLock") return;
+
+    const key = this.#state.container.querySelector(`.keyboard__key[data-code="${event.code}"]`);
+    if (!key) return;
+
     if (isActive) {
       if (!key.classList.contains('keyboard__key--active')) {
-        key.classList.add('keyboard__key--active');    
+        key.classList.add('keyboard__key--active');
       }
     } else {
       key.classList.remove('keyboard__key--active');
     }
   }
 
-  #checkCapsLockOnKeyPress(event) { 
+  #checkCapsLockOnKeyPress(event) {
     const isCapsLockActive = event.getModifierState('CapsLock');
+
     const keyCapsLock = this.#state.keyCapsLock;
-    
+
     if (isCapsLockActive !== this.#state.isCapsLockActive) {
       this.#state.isCapsLockActive = isCapsLockActive;
-      
+
       if (isCapsLockActive) {
         keyCapsLock.classList.add('keyboard__key--active');
       } else {
@@ -164,7 +161,7 @@ export class Keyboard {
 
   #updateModifierKeys(altKey, ctrlKey, shiftKey) {
     let isChange = false;
-    
+
     if (this.#state.altKey !== altKey) {
       this.#state.altKey = altKey;
       isChange = true;
@@ -179,12 +176,12 @@ export class Keyboard {
     }
     if (isChange) {
       this.#updateLevelKeyboard();
-    }     
+    }
   }
 
   #updateLevelKeyboard() {
     let newLevelKey = 1;
-  
+
     if (this.#state.altKey && this.#state.ctrlKey) {
       newLevelKey = this.#state.shiftKey ? 4 : 3;
     } else if (this.#state.shiftKey  && !this.#state.isCapsLockActive || !this.#state.shiftKey  && this.#state.isCapsLockActive) {
@@ -195,11 +192,11 @@ export class Keyboard {
       console.log(newLevelKey);
       this.#state.levelKey = newLevelKey;
       this.#updateKeyboardKeysText();
-    }    
+    }
   }
 
   #updateKeyboardKeysText() {
-    const elKeys = this.#state.container.querySelectorAll('.keyboard__key'); 
+    const elKeys = this.#state.container.querySelectorAll('.keyboard__key');
 
     for (let i = 0; i < elKeys.length; i++) {
       const searchCode = elKeys[i].dataset.code;
@@ -207,7 +204,7 @@ export class Keyboard {
       const findElement = this.#state.keybordInfo.keys.find(key => key.code === searchCode);
 
       if (!findElement.level_1) continue;
-      
+
       if (findElement[`level_${this.#state.levelKey}`]) {
         elKeys[i].textContent = findElement[`level_${this.#state.levelKey}`];
       } else {
