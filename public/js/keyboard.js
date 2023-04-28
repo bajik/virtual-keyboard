@@ -65,22 +65,17 @@ export class Keyboard {
       if (btn.title) {
         elKey.textContent = btn.title;
       }
-      
-      if (btn.width) {
-        if (btn.width === "grow") {
-          elKey.classList.add('keyboard__key--grow');
-        } else {
-          elKey.setAttribute('style', `width: ${parseFloat(btn.width)}rem`);
-        }
+      if (btn.style) {
+        elKey.setAttribute('style', btn.style);
       }
-
+      
       elRowKeys.appendChild(elKey);
     });
+    
     if (curentRow > 0) {
       elKeyboard.appendChild(elRowKeys);
     }
-    console.log(elKeyboard);
-
+   
     return elKeyboard;
   }
 
