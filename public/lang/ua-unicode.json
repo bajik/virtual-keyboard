@@ -29,7 +29,7 @@
       "level_1": "3",
       "level_2": "№",
       "level_3": "§",
-      "level_4": "€",
+      "level_4": "₴",
       "row": 1,
       "pos": 4
     }, {
@@ -102,15 +102,16 @@
       "pos": 13
     }, {
       "code": "Backspace",
-      "title": "\u21d0",
+      "title": "\u232B",
       "row": 1,
       "pos": 14,
-      "width": "grow"
+      "style": "flex-grow:1;font-size:1rem;"
     }, {
       "code": "Tab",
+      "title": "\u21E5",
       "row": 2,
       "pos": 1,
-      "width": "3.9"
+      "style": "width:55px;text-align:left;"
     }, {
       "code": "KeyQ",
       "level_1": "й",
@@ -200,12 +201,13 @@
       "level_4": "|",
       "row": 2,
       "pos": 14,
-      "width": "grow"
+      "style": "flex-grow:1;text-align:left;padding-left:12px;"
     }, {
       "code": "CapsLock",
+      "title": "Caps",
       "row": 3,
       "pos": 1,
-      "width": "4.5"
+      "style": "width:70px;text-align:left;font-size:1rem;"
     }, {
       "code": "KeyA",
       "level_1": "ф",
@@ -278,14 +280,16 @@
       "pos": 12
     }, {
       "code": "Enter",
+      "title": "\u23CE Enter",
       "row": 3,
       "pos": 13,
-      "width": "grow"
+      "style": "flex-grow:1;font-size:1rem;"
     }, {
-      "code": "ShiftLeft", 
+      "code": "ShiftLeft",
+      "title": "\u21d1 Shift",
+      "style": "width:85px;text-align:left;font-size:1rem;",
       "row": 4,
-      "pos": 1,
-      "width": "6"
+      "pos": 1
     }, {
       "code": "KeyZ",
       "level_1": "я",
@@ -355,47 +359,66 @@
       "row": 4,
       "pos": 11
     }, {
+      "code": "ArrowUp",
+      "title": "\u2191", 
+      "row": 4,
+      "pos": 11
+    }, {
       "code": "ShiftRight",
+      "title": "\u21d1 Shift", 
       "row": 4,
       "pos": 12,
-      "width": "grow"
+      "style": "width:85px;text-align:left;font-size:1rem;"
     }, {
       "code": "ControlLeft",
+      "title": "Ctrl",
       "row": 5,
-      "pos": 1
+      "pos": 1,
+      "style": "width:55px;text-align:left;font-size:1rem;"
     }, {
       "code": "MetaLeft",
+      "title": "\u2318",
       "row": 5,
-      "pos": 1
+      "pos": 1,
+      "style": "font-size:1rem;"
     }, {
       "code": "AltLeft",
+      "title": "Alt",
       "row": 5,
-      "pos": 1
+      "pos": 1,
+      "style": "width:50px;text-align:left;font-size:1rem;"
     }, {
       "code": "Space",
       "row": 5,
       "pos": 1,
-      "width": "grow"
+      "style": "flex-grow:1;"
     }, {
       "code": "AltRight",
+      "title": "Alt",
       "row": 5,
-      "pos": 1
+      "pos": 1,
+      "style": "width:50px;text-align:left;font-size:1rem;"
     }, {
       "code": "ArrowLeft",
+      "title": "\u2190",
       "row": 5,
       "pos": 1
     }, {
       "code": "ArrowDown",
+      "title": "\u2193",
       "row": 5,
       "pos": 1
     }, {
       "code": "ArrowRight",
+      "title": "\u2192",
       "row": 5,
       "pos": 1
     }, {
       "code": "ControlRight",
+      "title": "Ctrl",
       "row": 5,
-      "pos": 1
+      "pos": 1,
+      "style": "text-align:left;font-size:1rem;"
     }
   ]
 }
