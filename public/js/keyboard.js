@@ -1,4 +1,3 @@
-
 import * as utils from './utils.js';
 
 export class Keyboard {
@@ -123,8 +122,6 @@ export class Keyboard {
 
   #handleKeyPressEvent(isActive) {
 
-    console.log(event);
-
     this.#updateModifierKeys(event.altKey, event.ctrlKey, event.shiftKey);
 
     if (event.code === "AltLeft" || event.code === "AltRight") {
@@ -195,9 +192,27 @@ export class Keyboard {
     }
 
     if (this.#state.levelKey !== newLevelKey) {
+      console.log(newLevelKey);
       this.#state.levelKey = newLevelKey;
-    }
-    // this.#updateKeyboardKeysText();
+      this.#updateKeyboardKeysText();
+    }    
   }
 
+  #updateKeyboardKeysText() {
+    const elKeys = this.#state.container.querySelectorAll('.keyboard__key'); 
+
+    for (let i = 0; i < elKeys.length; i++) {
+      const searchCode = elKeys[i].dataset.code;
+
+      const findElement = this.#state.keybordInfo.keys.find(key => key.code === searchCode);
+
+      if (!findElement.level_1) continue;
+      
+      if (findElement[`level_${this.#state.levelKey}`]) {
+        elKeys[i].textContent = findElement[`level_${this.#state.levelKey}`];
+      } else {
+        elKeys[i].textContent = "";
+      }
+    }
+  }
 }
