@@ -7,17 +7,22 @@ export class Keyboard {
 
   constructor(container) {
     console.log('init', container);
-    this.#state = {
-      container: container
-    };
+
+    this.#getKeyboardInfo('ua-unicode').then((keybordInfo) => {
+      this.#state = {
+        container: container, 
+        keybordInfo: keybordInfo
+      };
   
-    this.#init();    
+      this.#init();
+    });
   };
 
   #init() {
     const elComp = utils.createElementWithAttributes('div', 'comp');     
     elComp.appendChild(this.#getMonitor());
     this.#state.container.appendChild(elComp);
+    console.log(this.#state);
   }
 
   #getMonitor() {
@@ -28,5 +33,12 @@ export class Keyboard {
     elMonitorScreen.appendChild(elWinEditor);
     elMonitor.appendChild(elMonitorScreen);
     return elMonitor;
-  }  
+  }
+
+  #getKeyboardInfo(lang) {
+    return fetch(`./lang/${lang}.json`).then((response) => {
+      return response.json();
+    });
+  }
+
 }
