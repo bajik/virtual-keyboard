@@ -6,7 +6,7 @@
       "code": "Backquote",
       "level_1": "'",
       "level_2": "ʼ",
-      "level_3": "", 
+      "level_3": "",
       "level_4": "~",
       "row": 1,
       "pos": 1
@@ -44,28 +44,28 @@
       "code": "Digit5",
       "level_1": "5",
       "level_2": "%",
-      "level_3": "°",    
+      "level_3": "°",
       "row": 1,
       "pos": 6
     }, {
       "code": "Digit6",
       "level_1": "6",
       "level_2": ":",
-      "level_3": "<",    
+      "level_3": "<",
       "row": 1,
       "pos": 7
     }, {
       "code": "Digit7",
       "level_1": "7",
       "level_2": "?",
-      "level_3": ">",    
+      "level_3": ">",
       "row": 1,
       "pos": 8
     }, {
       "code": "Digit8",
       "level_1": "8",
       "level_2": "*",
-      "level_3": "•",    
+      "level_3": "•",
       "row": 1,
       "pos": 9
     }, {
@@ -200,8 +200,13 @@
       "level_3": "\\",
       "level_4": "|",
       "row": 2,
-      "pos": 14,
-      "style": "flex-grow:1;text-align:left;padding-left:12px;"
+      "pos": 14
+    }, {
+      "code": "Delete",
+      "title": "Del",
+      "row": 2,
+      "pos": 15,
+      "style": "text-align:left;font-size:1rem;"
     }, {
       "code": "CapsLock",
       "title": "Caps",
@@ -306,7 +311,7 @@
       "code": "KeyC",
       "level_1": "с",
       "level_2": "С",
-      "level_3": "©",    
+      "level_3": "©",
       "row": 4,
       "pos": 4
     }, {
@@ -360,15 +365,15 @@
       "pos": 11
     }, {
       "code": "ArrowUp",
-      "title": "\u2191", 
+      "title": "\u2191",
       "row": 4,
       "pos": 11
     }, {
       "code": "ShiftRight",
-      "title": "\u21d1 Shift", 
+      "title": "\u21d1 Shift",
       "row": 4,
       "pos": 12,
-      "style": "width:85px;text-align:left;font-size:1rem;"
+      "style": "flex-grow:1;text-align:left;font-size:1rem;"
     }, {
       "code": "ControlLeft",
       "title": "Ctrl",
@@ -418,7 +423,7 @@
       "title": "Ctrl",
       "row": 5,
       "pos": 1,
-      "style": "text-align:left;font-size:1rem;"
+      "style": "width:58px;text-align:left;font-size:1rem;"
     }
   ]
 }

@@ -122,6 +122,8 @@ export class Keyboard {
 
     this.#updateModifierKeys(event.altKey, event.ctrlKey, event.shiftKey);
 
+    console.log(event.code);
+
     if (event.code === "AltLeft" || event.code === "AltRight") {
       event.preventDefault();
     }
