@@ -42,6 +42,15 @@ export class Keyboard {
       key.addEventListener('mousedown', this.#handleKeyMouseDown.bind(this));
       key.addEventListener('mouseup', this.#handleKeyMouseUp.bind(this));
     });
+
+    this.#state.winEditor.addEventListener('input', function() {
+      console.log(this.selectionStart);
+      
+    });
+    this.#state.winEditor.addEventListener('selectionchange', function() {
+      console.log(this.selectionStart);
+      
+    });
   }
 
   #handleKeyMouseDown(event) {
@@ -78,6 +87,7 @@ export class Keyboard {
         console.log(this.#state.levelKey);
         if (findElement[`level_${this.#state.levelKey}`]) {
           this.#state.winEditor.textContent += findElement[`level_${this.#state.levelKey}`];
+          console.log(this.#state.winEditor.clientWidth);
         }
       }
     }
@@ -266,17 +276,15 @@ export class Keyboard {
   #updateKeyboardKeysText() {
     const elKeys = this.#state.container.querySelectorAll('.keyboard__key');
 
-    for (let i = 0; i < elKeys.length; i++) {
-      const searchCode = elKeys[i].dataset.code;
-
+    for (const elKey of elKeys) {
+      const searchCode = elKey.dataset.code;
       const findElement = this.#state.keyboardInfo.keys.find(key => key.code === searchCode);
-
       if (!findElement.level_1) continue;
 
-      if (findElement[`level_${this.#state.levelKey}`]) {
-        elKeys[i].textContent = findElement[`level_${this.#state.levelKey}`];
+      if (this.#state.levelKey === 2 && this.#state.isCapsLockActive && findElement.row === 1) {
+        elKey.textContent = findElement.level_1 || "";
       } else {
-        elKeys[i].textContent = "";
+        elKey.textContent = findElement[`level_${this.#state.levelKey}`] || "";
       }
     }
   }
