@@ -266,7 +266,7 @@ export class Keyboard {
   #updateLevelKeyboard() {
     let newLevelKey = 1;
 
-    if (this.#state.isAltKeyActive && this.#state.isCtrlKeyActive) {
+    if (this.#state.isAltKeyActive && this.#state.isCtrlKeyActive && this.#state.keyboardInfo.max_level > 2) {
       newLevelKey = this.#state.isShiftKeyActive ? 4 : 3;
     } else if (this.#state.isShiftKeyActive  && !this.#state.isCapsLockActive || !this.#state.isShiftKeyActive  && this.#state.isCapsLockActive) {
       newLevelKey = 2
@@ -281,7 +281,6 @@ export class Keyboard {
 
   #updateKeyboardKeysText() {
     const elKeys = this.#state.container.querySelectorAll('.keyboard__key');
-
     for (const elKey of elKeys) {
       const searchCode = elKey.dataset.code;
       const findElement = this.#state.keyboardInfo.keys.find(key => key.code === searchCode);
