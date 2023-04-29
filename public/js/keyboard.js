@@ -7,7 +7,7 @@ export class Keyboard {
   constructor(container) {
     console.log('init', container);
 
-    this.#getKeyboardInfo('ua-unicode').then((keyboardInfo) => {
+    this.#getKeyboardInfo('en').then((keyboardInfo) => {
       this.#state = {
         container: container,
         keyboardInfo: keyboardInfo,
@@ -15,6 +15,10 @@ export class Keyboard {
           'ControlLeft', 'ControlRight',
           'AltLeft', 'AltRight',
           'ShiftLeft', 'ShiftRight'
+        ],
+        arrowsKeys: [
+          'ArrowLeft', 'ArrowRight',
+          'ArrowDown', 'ArrowUp'
         ]
       };
 
@@ -45,11 +49,9 @@ export class Keyboard {
 
     this.#state.winEditor.addEventListener('input', function() {
       console.log(this.selectionStart);
-      
     });
     this.#state.winEditor.addEventListener('selectionchange', function() {
       console.log(this.selectionStart);
-      
     });
   }
 
@@ -197,15 +199,19 @@ export class Keyboard {
   #handleKeyPressEvent(isActive) {
 
     this.#updateModifierKeys(event.altKey, event.ctrlKey, event.shiftKey);
+    const keyCode = event.code;
 
-    console.log(event.code);
-
-    if (event.code === "AltLeft" || event.code === "AltRight") {
+    if (this.#state.modifierKeys.includes(keyCode) || this.#state.arrowsKeys.includes(keyCode)) {
       event.preventDefault();
+      if (this.#state.arrowsKeys.includes(keyCode) && isActive) {
+        console.log('arrowsKeys');
+        const findElement = this.#state.keyboardInfo.keys.find(key => key.code === keyCode);
+        this.#state.winEditor.textContent += findElement[`title`];
+      }
     }
 
     this.#checkCapsLockOnKeyPress(event);
-    if (event.code === "CapsLock") return;
+    if (keyCode === "CapsLock") return;
 
     const key = this.#state.container.querySelector(`.keyboard__key[data-code="${event.code}"]`);
     if (!key) return;
