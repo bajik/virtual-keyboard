@@ -4,10 +4,13 @@ export class Keyboard {
 
   #state
 
+  #listLanguages = ['en', 'ua-unicode'];
+  #currentIndex = 0;
+
   constructor(container) {
     console.log('init', container);
 
-    this.#getKeyboardInfo('en').then((keyboardInfo) => {
+    this.#getKeyboardInfo(this.#listLanguages[this.#currentIndex]).then((keyboardInfo) => {
       this.#state = {
         container: container,
         keyboardInfo: keyboardInfo,
@@ -41,11 +44,7 @@ export class Keyboard {
     this.#state.container.addEventListener("keyup", this.#handleKeyPressEvent.bind(this, false));
     window.addEventListener("focus", this.#removeActiveClassFromKeys.bind(this));
 
-    const keys = this.#state.container.querySelectorAll('.keyboard__key');
-    keys.forEach(key => {
-      key.addEventListener('mousedown', this.#handleKeyMouseDown.bind(this));
-      key.addEventListener('mouseup', this.#handleKeyMouseUp.bind(this));
-    });
+    this.#attachKeyboardEvents();
 
     this.#state.winEditor.addEventListener('input', function() {
       console.log(this.selectionStart);
@@ -55,31 +54,21 @@ export class Keyboard {
     });
   }
 
+  #attachKeyboardEvents() {
+    const keys = this.#state.container.querySelectorAll('.keyboard__key');
+    keys.forEach(key => {
+      key.addEventListener('mousedown', this.#handleKeyMouseDown.bind(this));
+      key.addEventListener('mouseup', this.#handleKeyMouseUp.bind(this));
+    });
+  }
+
   #handleKeyMouseDown(event) {
     const key = event.target;
     const keyCode = key.dataset.code;
 
     if (this.#state.modifierKeys.includes(keyCode) || keyCode === 'CapsLock') {
       key.classList.toggle('keyboard__key--active');
-
-      switch (keyCode) {
-        case 'ControlLeft':
-        case 'ControlRight':
-          this.#state.isCtrlKeyActive = !this.#state.isCtrlKeyActive;
-          break;
-        case 'AltLeft':
-        case 'AltRight':
-          this.#state.isAltKeyActive = !this.#state.isAltKeyActive;
-          break;
-        case 'ShiftLeft':
-        case 'ShiftRight':
-          this.#state.isShiftKeyActive = !this.#state.isShiftKeyActive;
-          break;
-        case 'CapsLock':
-          this.#state.isCapsLockActive = !this.#state.isCapsLockActive;
-          break;
-      }
-      this.#updateLevelKeyboard();
+      this.#updateModifierKey(keyCode)
     } else {
       if (!key.classList.contains('keyboard__key--active')) {
         key.classList.add('keyboard__key--active');
@@ -96,7 +85,24 @@ export class Keyboard {
   }
 
   #resetModifierKeys() {
+    this.#state.isCtrlKeyActive = false;
+    this.#state.isAltKeyActive = false;
+    this.#state.isShiftKeyActive = false;
 
+    const btnCtrlLeft = this.#state.container.querySelector(`.keyboard__key[data-code="ControlLeft"]`);
+    btnCtrlLeft.classList.remove('.keyboard__key--active');
+    const btnCtrlRight = this.#state.container.querySelector(`.keyboard__key[data-code="ControlRight"]`);
+    btnCtrlRight.classList.remove('.keyboard__key--active');
+
+    const btnAltLeft = this.#state.container.querySelector(`.keyboard__key[data-code="AltLeft"]`);
+    btnAltLeft.classList.remove('.keyboard__key--active');
+    const btnAltRight = this.#state.container.querySelector(`.keyboard__key[data-code="ArrowRight"]`);
+    btnAltRight.classList.remove('.keyboard__key--active');
+
+    const btnShiftLeft = this.#state.container.querySelector(`.keyboard__key[data-code="ShiftLeft"]`);
+    btnShiftLeft.classList.remove('.keyboard__key--active');
+    const btnShiftRight = this.#state.container.querySelector(`.keyboard__key[data-code="ShiftRight"]`);
+    btnShiftRight.classList.remove('.keyboard__key--active');
   }
 
   #handleKeyMouseUp(event) {
@@ -123,6 +129,10 @@ export class Keyboard {
     elComp.appendChild(this.#renderKeyboard());
 
     this.#state.container.appendChild(elComp);
+  }
+
+  #changeKeyboard() {
+
   }
 
   #renderMonitor() {
@@ -243,6 +253,30 @@ export class Keyboard {
     }
   }
 
+  #checkKeyboardLanguageToggle() {
+    console.log(this.#state.isAltKeyActive, this.#state.isShiftKeyActive, this.#state.isCtrlKeyActive);
+    if (this.#state.isAltKeyActive && this.#state.isShiftKeyActive && !this.#state.isCtrlKeyActive) {
+      this.#KeyboardLanguageToggle();
+    }
+  }
+
+  #KeyboardLanguageToggle() {
+    this.#currentIndex = (this.#currentIndex + 1) % this.#listLanguages.length;
+    this.#resetModifierKeys();
+    this.#getKeyboardInfo(this.#listLanguages[this.#currentIndex]).then((keyboardInfo) => {
+      this.#state.keyboardInfo = keyboardInfo;
+      this.#deleteKeyboard();
+      const elComp = this.#state.container.querySelector('.comp');
+      elComp.appendChild(this.#renderKeyboard());
+      this.#attachKeyboardEvents();
+    });
+  }
+
+  #deleteKeyboard() {
+    const keyboard = this.#state.container.querySelector('.keyboard');
+    keyboard.remove();
+  }
+
   #updateModifierKeys(isAltKeyActive, isCtrlKeyActive, isShiftKeyActive) {
     let isChange = false;
 
@@ -259,8 +293,32 @@ export class Keyboard {
       isChange = true;
     }
     if (isChange) {
+      this.#checkKeyboardLanguageToggle();
       this.#updateLevelKeyboard();
     }
+  }
+
+  #updateModifierKey(keyCode) {
+    switch (keyCode) {
+      case 'ControlLeft':
+      case 'ControlRight':
+        this.#state.isCtrlKeyActive = !this.#state.isCtrlKeyActive;
+        break;
+      case 'AltLeft':
+      case 'AltRight':
+        this.#state.isAltKeyActive = !this.#state.isAltKeyActive;
+        break;
+      case 'ShiftLeft':
+      case 'ShiftRight':
+        this.#state.isShiftKeyActive = !this.#state.isShiftKeyActive;
+        break;
+      case 'CapsLock':
+        this.#state.isCapsLockActive = !this.#state.isCapsLockActive;
+        break;
+    }
+    console.log('updateModifierKey');
+    this.#checkKeyboardLanguageToggle();
+    this.#updateLevelKeyboard();
   }
 
   #updateLevelKeyboard() {
