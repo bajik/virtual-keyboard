@@ -1,5 +1,30 @@
 import * as utils from './utils.js';
 
+let winEditorPosition = 0;
+
+class ModifierButton {
+  constructor(container, code) {
+    this._active = false;
+    this._container = container;
+    this._code = code;
+  }
+  get isActive() {
+    return this._active;
+  }
+  set isActive(value) {
+    this._code.forEach(code => {
+      const btn = this._container.querySelector(`.keyboard__key[data-code="${code}"]`);
+      if (value) {
+        btn.classList.add('keyboard__key--active');
+      } else {
+        btn.classList.remove('keyboard__key--active');
+      }
+    });
+    this._active = value;
+  }
+}
+
+
 export class Keyboard {
 
   #state
@@ -8,8 +33,10 @@ export class Keyboard {
   #currentIndex = 0;
 
   constructor(container) {
-    console.log('init', container);
-
+    const langIndex = localStorage.getItem('lang');
+    if (langIndex) {
+      this.#currentIndex = langIndex;
+    }
     this.#getKeyboardInfo(this.#listLanguages[this.#currentIndex]).then((keyboardInfo) => {
       this.#state = {
         container: container,
@@ -24,37 +51,39 @@ export class Keyboard {
           'ArrowDown', 'ArrowUp'
         ]
       };
-
       this.#init();
     });
   };
 
   #init() {
+    // console.log('init');
+    this.#state.altButton = new ModifierButton(this.#state.container, ['AltLeft', 'AltRight']);
+    this.#state.controlButton = new ModifierButton(this.#state.container, ['ControlLeft', 'ControlRight']);
+    this.#state.shiftButton = new ModifierButton(this.#state.container, ['ShiftLeft', 'ShiftRight']);
+    this.#state.capsLockButton = new ModifierButton(this.#state.container, ['CapsLock']);
+
+    localStorage.setItem ('lang', this.#currentIndex);
     this.#renderComp();
     this.#state.winEditor = this.#state.container.querySelector('#win_editor');
+    this.#state.winEditor.focus();
+    this.#state.winEditor.selectionStart = 0;
     this.#attachEvents();
 
     this.#state.keyCapsLock = this.#state.container.querySelector(`.keyboard__key[data-code="CapsLock"]`);
     this.#updateLevelKeyboard();
-    console.log(this.#state);
   }
 
   #attachEvents() {
+    // console.log('attachEvents');
     this.#state.container.addEventListener("keydown", this.#handleKeyPressEvent.bind(this, true));
     this.#state.container.addEventListener("keyup", this.#handleKeyPressEvent.bind(this, false));
     window.addEventListener("focus", this.#removeActiveClassFromKeys.bind(this));
 
     this.#attachKeyboardEvents();
-
-    this.#state.winEditor.addEventListener('input', function() {
-      console.log(this.selectionStart);
-    });
-    this.#state.winEditor.addEventListener('selectionchange', function() {
-      console.log(this.selectionStart);
-    });
   }
 
   #attachKeyboardEvents() {
+    // console.log('attachKeyboardEvents');
     const keys = this.#state.container.querySelectorAll('.keyboard__key');
     keys.forEach(key => {
       key.addEventListener('mousedown', this.#handleKeyMouseDown.bind(this));
@@ -63,49 +92,88 @@ export class Keyboard {
   }
 
   #handleKeyMouseDown(event) {
+    // console.log('handleKeyMouseDown');
     const key = event.target;
     const keyCode = key.dataset.code;
+    if (keyCode === 'CapsLock') {
+      this.#state.capsLockButton.isActive = !this.#state.capsLockButton.isActive;
+      this.#updateLevelKeyboard();
+    } else if (keyCode === "ArrowLeft") {
+      this.#state.winEditor.selectionStart -= 1;
+      // this.#state.winEditor.selectionEnd = this.#state.winEditor.selectionStart - 1;
+    } else if (this.#state.modifierKeys.includes(keyCode)) {
+      switch (keyCode) {
+        case 'ControlLeft':
+        case 'ControlRight':
+          this.#state.controlButton.isActive = !this.#state.controlButton.isActive;
+          break;
+        case 'AltLeft':
+        case 'AltRight':
+          this.#state.altButton.isActive = !this.#state.altButton.isActive;
+          break;
+        case 'ShiftLeft':
+        case 'ShiftRight':
+          this.#state.shiftButton.isActive = !this.#state.shiftButton.isActive;
+          break;
+      }
 
-    if (this.#state.modifierKeys.includes(keyCode) || keyCode === 'CapsLock') {
-      key.classList.toggle('keyboard__key--active');
-      this.#updateModifierKey(keyCode)
+      // таймер
+      this.#checkKeyboardLanguageToggle(event.shiftKey, event.altKey, true);
+      this.#updateLevelKeyboard();
     } else {
       if (!key.classList.contains('keyboard__key--active')) {
         key.classList.add('keyboard__key--active');
-        const searchCode = key.dataset.code;
+        const searchCode = keyCode;
         const findElement = this.#state.keyboardInfo.keys.find(key => key.code === searchCode);
-        console.log(findElement);
-        console.log(this.#state.levelKey);
-        if (findElement[`level_${this.#state.levelKey}`]) {
-          this.#state.winEditor.textContent += findElement[`level_${this.#state.levelKey}`];
-          console.log(this.#state.winEditor.clientWidth);
+
+        const pos = this.#state.winEditor.selectionStart;
+        const text = this.#state.winEditor.value;
+        let symbol;
+        let posShift = 1;
+        
+        if (keyCode === "Tab") {
+          symbol = "    ";
+          posShift = 4;
+        } else if (keyCode === "Enter") {
+          symbol = "\n"
+        } else if (keyCode === "Space") {
+          symbol = " "
+        } else if (keyCode === "Backspace") {
+          symbol = ""
+          posShift = -1;
+        } else if (keyCode === "Delete") {
+          symbol = ""
+          posShift = -1;
+        } else {
+          if (findElement[`level_${this.#state.levelKey}`]) {
+            symbol = findElement[`level_${this.#state.levelKey}`];
+          } else {
+            return;
+          }
+        }
+        // console.log(symbol);
+        const newText = text.substring(0, pos + (posShift < 0 ? posShift: 0)) + symbol + text.substring(pos);
+        this.#state.winEditor.value = newText;
+        this.#state.winEditor.selectionStart = pos + posShift;
+        this.#state.winEditor.selectionEnd = pos + posShift;
+        this.#state.winEditor.focus();
+        if (this.#state.altButton.isActive || this.#state.shiftButton.isActive || this.#state.controlButton.isActive) {
+          this.#resetModifierKeys();
+          this.#updateLevelKeyboard();
         }
       }
     }
   }
 
   #resetModifierKeys() {
-    this.#state.isCtrlKeyActive = false;
-    this.#state.isAltKeyActive = false;
-    this.#state.isShiftKeyActive = false;
-
-    const btnCtrlLeft = this.#state.container.querySelector(`.keyboard__key[data-code="ControlLeft"]`);
-    btnCtrlLeft.classList.remove('.keyboard__key--active');
-    const btnCtrlRight = this.#state.container.querySelector(`.keyboard__key[data-code="ControlRight"]`);
-    btnCtrlRight.classList.remove('.keyboard__key--active');
-
-    const btnAltLeft = this.#state.container.querySelector(`.keyboard__key[data-code="AltLeft"]`);
-    btnAltLeft.classList.remove('.keyboard__key--active');
-    const btnAltRight = this.#state.container.querySelector(`.keyboard__key[data-code="ArrowRight"]`);
-    btnAltRight.classList.remove('.keyboard__key--active');
-
-    const btnShiftLeft = this.#state.container.querySelector(`.keyboard__key[data-code="ShiftLeft"]`);
-    btnShiftLeft.classList.remove('.keyboard__key--active');
-    const btnShiftRight = this.#state.container.querySelector(`.keyboard__key[data-code="ShiftRight"]`);
-    btnShiftRight.classList.remove('.keyboard__key--active');
+    // console.log('resetModifierKeys');
+    this.#state.altButton.isActive = false;
+    this.#state.controlButton.isActive = false;
+    this.#state.shiftButton.isActive = false;
   }
 
   #handleKeyMouseUp(event) {
+    // console.log('handleKeyMouseUp');
     const key = event.target;
     const keyCode = key.dataset.code;
 
@@ -117,13 +185,16 @@ export class Keyboard {
 
 
   #removeActiveClassFromKeys() {
+    // console.log('removeActiveClassFromKeys');
     const keys = this.#state.container.querySelectorAll('.keyboard__key[data-code]:not([data-code="CapsLock"])');
     keys.forEach(key => {
       key.classList.remove('keyboard__key--active');
     });
+    this.#resetModifierKeys();
   }
 
   #renderComp() {
+    // console.log('renderComp');
     const elComp = utils.createElementWithAttributes('div', 'comp');
     elComp.appendChild(this.#renderMonitor());
     elComp.appendChild(this.#renderKeyboard());
@@ -131,11 +202,8 @@ export class Keyboard {
     this.#state.container.appendChild(elComp);
   }
 
-  #changeKeyboard() {
-
-  }
-
   #renderMonitor() {
+    // console.log('renderMonitor');
     const elMonitor = utils.createElementWithAttributes('div', 'monitor');
     const elMonitorScreen = utils.createElementWithAttributes('div', 'monitor__screen');
     const elWinEditor = utils.createElementWithAttributes('textarea', 'win_editor', { id: 'win_editor'});
@@ -146,6 +214,7 @@ export class Keyboard {
   }
 
   #renderKeyboard() {
+    // console.log('renderKeyboard');
     const elKeyboard = utils.createElementWithAttributes('div', 'keyboard');
     this.#sortKeys();
     let currentRow = 0;
@@ -171,6 +240,7 @@ export class Keyboard {
   }
 
   #createKeyButton(btn) {
+    // console.log('createKeyButton');
     const elKey = utils.createElementWithAttributes('button', 'keyboard__key', {'data-code': btn.code})
     if (btn.level_1) {
       elKey.textContent = btn.level_1;
@@ -185,6 +255,7 @@ export class Keyboard {
   }
 
   #createKeyboardRow(btn) {
+    // console.log('createKeyboardRow');
     const elRowKeys = utils.createElementWithAttributes('div', 'keyboard__row');
     const elKey = this.#createKeyButton(btn);
     elRowKeys.appendChild(elKey);
@@ -192,6 +263,7 @@ export class Keyboard {
   }
 
   #sortKeys() {
+    console.log('sortKeys');
     this.#state.keyboardInfo.keys.sort((a, b) => {
       if (a.row === b.row) {
         return a.pos - b.pos;
@@ -201,150 +273,111 @@ export class Keyboard {
   }
 
   #getKeyboardInfo(lang) {
+    // console.log('getKeyboardInfo');
     return fetch(`./lang/${lang}.json`).then((response) => {
       return response.json();
     });
   }
 
   #handleKeyPressEvent(isActive) {
-
-    this.#updateModifierKeys(event.altKey, event.ctrlKey, event.shiftKey);
+    // console.log('handleKeyPressEvent');
+    console.log(event);
+    this.#state.winEditor.focus();
     const keyCode = event.code;
-
-    if (this.#state.modifierKeys.includes(keyCode) || this.#state.arrowsKeys.includes(keyCode)) {
+    if (this.#state.modifierKeys.includes(keyCode)) {
+      this.#checkKeyboardLanguageToggle(event.shiftKey, event.altKey);
+      console.log(keyCode);
+      console.log(this.#state);
       event.preventDefault();
-      if (this.#state.arrowsKeys.includes(keyCode) && isActive) {
-        console.log('arrowsKeys');
-        const findElement = this.#state.keyboardInfo.keys.find(key => key.code === keyCode);
-        this.#state.winEditor.textContent += findElement[`title`];
+      switch (keyCode) {
+        case 'ControlLeft':
+        case 'ControlRight':
+          this.#state.controlButton.isActive = isActive;
+          break;
+        case 'AltLeft':
+        case 'AltRight':
+          this.#state.altButton.isActive = isActive;
+          break;
+        case 'ShiftLeft':
+        case 'ShiftRight':
+          this.#state.shiftButton.isActive = isActive;
+          break;
       }
-    }
-
-    this.#checkCapsLockOnKeyPress(event);
-    if (keyCode === "CapsLock") return;
-
-    const key = this.#state.container.querySelector(`.keyboard__key[data-code="${event.code}"]`);
-    if (!key) return;
-
-    if (isActive) {
-      if (!key.classList.contains('keyboard__key--active')) {
-        key.classList.add('keyboard__key--active');
-      }
+      this.#updateLevelKeyboard();
     } else {
-      key.classList.remove('keyboard__key--active');
+      this.#checkCapsLockOnKeyPress(event);
+      if (keyCode === "CapsLock") return;
+
+      const key = this.#state.container.querySelector(`.keyboard__key[data-code="${event.code}"]`);
+      if (!key) return;
+
+      if (isActive) {
+        if (!key.classList.contains('keyboard__key--active')) {
+          key.classList.add('keyboard__key--active');
+        }
+      } else {
+        key.classList.remove('keyboard__key--active');
+      }
     }
   }
 
   #checkCapsLockOnKeyPress(event) {
+    // console.log('checkCapsLockOnKeyPress');
     const isCapsLockActive = event.getModifierState('CapsLock');
-
-    const keyCapsLock = this.#state.keyCapsLock;
-
-    if (isCapsLockActive !== this.#state.isCapsLockActive) {
-      this.#state.isCapsLockActive = isCapsLockActive;
-
-      if (isCapsLockActive) {
-        keyCapsLock.classList.add('keyboard__key--active');
-      } else {
-        keyCapsLock.classList.remove('keyboard__key--active');
-      }
-
+    if (this.#state.capsLockButton.isActive !== isCapsLockActive) {
+      this.#state.capsLockButton.isActive = isCapsLockActive;
       this.#updateLevelKeyboard();
     }
   }
 
-  #checkKeyboardLanguageToggle() {
-    console.log(this.#state.isAltKeyActive, this.#state.isShiftKeyActive, this.#state.isCtrlKeyActive);
-    if (this.#state.isAltKeyActive && this.#state.isShiftKeyActive && !this.#state.isCtrlKeyActive) {
+  #checkKeyboardLanguageToggle(isShiftKeyActive, isAltKeyActive, isMouse) {
+    // console.log('checkKeyboardLanguageToggle');
+    if (this.#state.altButton.isActive && this.#state.shiftButton.isActive &&
+       !this.#state.controlButton.isActive && !(isShiftKeyActive && isAltKeyActive)) {
       this.#KeyboardLanguageToggle();
+      if (isMouse) {
+        this.#resetModifierKeys();
+      }
     }
   }
 
   #KeyboardLanguageToggle() {
+    // console.log('KeyboardLanguageToggle');
     this.#currentIndex = (this.#currentIndex + 1) % this.#listLanguages.length;
-    this.#resetModifierKeys();
+    localStorage.setItem ('lang', this.#currentIndex);
+    // this.#resetModifierKeys();
     this.#getKeyboardInfo(this.#listLanguages[this.#currentIndex]).then((keyboardInfo) => {
       this.#state.keyboardInfo = keyboardInfo;
-      this.#deleteKeyboard();
-      const elComp = this.#state.container.querySelector('.comp');
-      elComp.appendChild(this.#renderKeyboard());
-      this.#attachKeyboardEvents();
+      this.#updateKeyboardKeysText();
     });
   }
 
-  #deleteKeyboard() {
-    const keyboard = this.#state.container.querySelector('.keyboard');
-    keyboard.remove();
-  }
-
-  #updateModifierKeys(isAltKeyActive, isCtrlKeyActive, isShiftKeyActive) {
-    let isChange = false;
-
-    if (this.#state.isAltKeyActive !== isAltKeyActive) {
-      this.#state.isAltKeyActive = isAltKeyActive;
-      isChange = true;
-    }
-    if (this.#state.isCtrlKeyActive !== isCtrlKeyActive) {
-      this.#state.isCtrlKeyActive = isCtrlKeyActive;
-      isChange = true;
-    }
-    if (this.#state.isShiftKeyActive !== isShiftKeyActive) {
-      this.#state.isShiftKeyActive = isShiftKeyActive;
-      isChange = true;
-    }
-    if (isChange) {
-      this.#checkKeyboardLanguageToggle();
-      this.#updateLevelKeyboard();
-    }
-  }
-
-  #updateModifierKey(keyCode) {
-    switch (keyCode) {
-      case 'ControlLeft':
-      case 'ControlRight':
-        this.#state.isCtrlKeyActive = !this.#state.isCtrlKeyActive;
-        break;
-      case 'AltLeft':
-      case 'AltRight':
-        this.#state.isAltKeyActive = !this.#state.isAltKeyActive;
-        break;
-      case 'ShiftLeft':
-      case 'ShiftRight':
-        this.#state.isShiftKeyActive = !this.#state.isShiftKeyActive;
-        break;
-      case 'CapsLock':
-        this.#state.isCapsLockActive = !this.#state.isCapsLockActive;
-        break;
-    }
-    console.log('updateModifierKey');
-    this.#checkKeyboardLanguageToggle();
-    this.#updateLevelKeyboard();
-  }
-
   #updateLevelKeyboard() {
+    // console.log('updateLevelKeyboard');
     let newLevelKey = 1;
 
-    if (this.#state.isAltKeyActive && this.#state.isCtrlKeyActive && this.#state.keyboardInfo.max_level > 2) {
-      newLevelKey = this.#state.isShiftKeyActive ? 4 : 3;
-    } else if (this.#state.isShiftKeyActive  && !this.#state.isCapsLockActive || !this.#state.isShiftKeyActive  && this.#state.isCapsLockActive) {
+    if (this.#state.altButton.isActive && this.#state.controlButton.isActive && this.#state.keyboardInfo.max_level > 2) {
+      newLevelKey = this.#state.shiftButton.isActive ? 4 : 3;
+    } else if (this.#state.shiftButton.isActive && !this.#state.capsLockButton.isActive ||
+              !this.#state.shiftButton.isActive && this.#state.capsLockButton.isActive) {
       newLevelKey = 2
     }
 
     if (this.#state.levelKey !== newLevelKey) {
-      console.log(newLevelKey);
       this.#state.levelKey = newLevelKey;
       this.#updateKeyboardKeysText();
     }
   }
 
   #updateKeyboardKeysText() {
+    console.log('updateKeyboardKeysText');
     const elKeys = this.#state.container.querySelectorAll('.keyboard__key');
     for (const elKey of elKeys) {
       const searchCode = elKey.dataset.code;
       const findElement = this.#state.keyboardInfo.keys.find(key => key.code === searchCode);
       if (!findElement.level_1) continue;
 
-      if (this.#state.levelKey === 2 && this.#state.isCapsLockActive && findElement.row === 1) {
+      if (this.#state.levelKey === 2 && this.#state.capsLockButton.isActive && findElement.row === 1) {
         elKey.textContent = findElement.level_1 || "";
       } else {
         elKey.textContent = findElement[`level_${this.#state.levelKey}`] || "";
