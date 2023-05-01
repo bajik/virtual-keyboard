@@ -39,7 +39,7 @@ export default class Keyboard {
     this.#state.shiftButton = new ModifierButton(this.#state.container, ['ShiftLeft', 'ShiftRight']);
     this.#state.capsLockButton = new ModifierButton(this.#state.container, ['CapsLock']);
 
-    localStorage.setItem('lang', this.currentIndex);
+    // localStorage.setItem('lang', this.currentIndex);
     this.#renderComp();
     this.#state.winEditor = this.#state.container.querySelector('#win_editor');
     this.#state.winEditor.focus();
