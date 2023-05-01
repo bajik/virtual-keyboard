@@ -1,9 +1,9 @@
-export function createElementWithAttributes(tag, clasNames, attributes) {
+export function createElementWithAttributes(tag, classNames, attributes) {
   if (typeof (tag) !== 'string') return undefined;
   const elem = document.createElement(tag);
 
-  if (clasNames) {
-    elem.classList.add(...clasNames.split(' '));
+  if (classNames) {
+    elem.classList.add(...classNames.split(' '));
   }
   if (attributes) {
     Object.keys(attributes).forEach((attr) => {

@@ -210,6 +210,15 @@ export default class Keyboard {
 
   #renderComp() {
     const elComp = createElementWithAttributes('div', 'comp');
+    const blockHeader = createElementWithAttributes('h1', 'title');
+    blockHeader.textContent = 'Виртуальная клавиатура';
+    elComp.appendChild(blockHeader);
+    let blockText = createElementWithAttributes('div', 'text');
+    blockText.innerHTML = 'Клавиатура создана в операционной системе <strong>Windows</strong>';
+    elComp.appendChild(blockText);
+    blockText = createElementWithAttributes('div', 'text');
+    blockText.innerHTML = 'Для переключения языка комбинация: левые <strong>Alt+Shift</strong>';
+    elComp.appendChild(blockText);
 
     elComp.appendChild(renderMonitor());
     elComp.appendChild(this.#renderKeyboard());
@@ -349,18 +358,22 @@ export default class Keyboard {
 
   #updateKeyboardKeysText() {
     const elKeys = this.#state.container.querySelectorAll('.keyboard__key');
-    elKeys.forEach((elKey) => {
+    for (let i = 0; i < elKeys.length; i += 1) {
+      const elKey = elKeys[i];
       const searchCode = elKey.dataset.code;
       const findElement = this.#state.keyboardInfo.keys.find((key) => key.code === searchCode);
 
-      if (!findElement.level_1) return;
+      if (findElement.level_1) {
+        let keyText;
+        if (this.#state.levelKey === 2 && this.#state.capsLockButton.isActive
+            && findElement.row === 1) {
+          keyText = findElement.level_1 || '';
+        } else {
+          keyText = findElement[`level_${this.#state.levelKey}`] || '';
+        }
 
-      if (this.#state.levelKey === 2 && this.#state.capsLockButton.isActive
-          && findElement.row === 1) {
-        elKey.textContent = findElement.level_1 || '';
-      } else {
-        elKey.textContent = findElement[`level_${this.#state.levelKey}`] || '';
+        elKey.textContent = keyText;
       }
-    });
+    }
   }
 }

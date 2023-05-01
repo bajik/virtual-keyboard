@@ -2,12 +2,26 @@
   box-sizing: border-box;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+.title {
+  text-align: center;
+  margin: 10px auto 5px;
+  font-family: 'Roboto', sans-serif;;
+  font-weight: 700;
+}
+
+.text {
+  text-align: center;
+  font-family: 'Roboto', sans-serif;;
+  font-weight: 400;
+}
+
 .monitor__screen {
   border: 1px solid black;
-  height: 300px;
-  width: 515px;
-  margin: 0 auto;
-  /* overflow-y: scroll; */
+  height: 288px;
+  width: 512px;
+  margin: -30px auto 0;
   border: solid 1rem #333;
   border-radius: .5rem;
 }
@@ -24,7 +38,7 @@
   background: #222;
   width: 100px;
   height: 50px;
-  top: 350px;
+  bottom: -308px;
   left: calc(50% - 50px);
 }
 .monitor:after {
@@ -45,10 +59,11 @@
   height: 100%;
   outline: none;
   padding: 5px;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 1.125rem;
   overflow-x: scroll;
   white-space: nowrap;
+  resize: none;
 }
 
 .keyboard {
@@ -59,7 +74,7 @@
   row-gap: 0.5rem;
   width: fit-content;
   margin: 2rem auto 0;
-  padding: 1.5rem 1rem 1rem;
+  padding: 1rem 1rem 1rem;
   border: 2px solid black;
   border-radius: 0.5rem;
   transform: perspective(1000px) rotateX(40deg);
