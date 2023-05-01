@@ -1,7 +1,7 @@
 {
   "name": "Ukrainian Unicode",
   "description": "",
-  "max_level": 4,
+  "maxLevel": 4,
   "keys": [
     {
       "code": "Backquote",

@@ -1,6 +1,6 @@
-import { Keyboard } from './keyboard.js';
+import Keyboard from './keyboard.js';
 
 const page = document.querySelector('.page');
 
-console.log(page);
-const kbt = new Keyboard(page);
+const myKeyboard = new Keyboard(page);
+myKeyboard.currentIndex = 0;
