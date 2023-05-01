@@ -24,9 +24,7 @@ class ModifierButton {
   }
 }
 
-
 export class Keyboard {
-
   #state
 
   #listLanguages = ['en', 'ua-unicode'];
@@ -56,7 +54,6 @@ export class Keyboard {
   };
 
   #init() {
-    // console.log('init');
     this.#state.altButton = new ModifierButton(this.#state.container, ['AltLeft', 'AltRight']);
     this.#state.controlButton = new ModifierButton(this.#state.container, ['ControlLeft', 'ControlRight']);
     this.#state.shiftButton = new ModifierButton(this.#state.container, ['ShiftLeft', 'ShiftRight']);
@@ -74,16 +71,13 @@ export class Keyboard {
   }
 
   #attachEvents() {
-    // console.log('attachEvents');
     this.#state.container.addEventListener("keydown", this.#handleKeyPressEvent.bind(this, true));
     this.#state.container.addEventListener("keyup", this.#handleKeyPressEvent.bind(this, false));
     window.addEventListener("focus", this.#removeActiveClassFromKeys.bind(this));
-
     this.#attachKeyboardEvents();
   }
 
   #attachKeyboardEvents() {
-    // console.log('attachKeyboardEvents');
     const keys = this.#state.container.querySelectorAll('.keyboard__key');
     keys.forEach(key => {
       key.addEventListener('mousedown', this.#handleKeyMouseDown.bind(this));
@@ -167,7 +161,7 @@ export class Keyboard {
         const text = this.#state.winEditor.value;
         let symbol;
         let posShift = 1;
-        
+        let postShift = 0;
         if (keyCode === "Tab") {
           symbol = "    ";
           posShift = 4;
@@ -179,8 +173,9 @@ export class Keyboard {
           symbol = ""
           posShift = -1;
         } else if (keyCode === "Delete") {
-          symbol = ""
-          posShift = -1;
+          symbol = "";
+          posShift = 0;
+          postShift = 1;
         } else {
           if (findElement[`level_${this.#state.levelKey}`]) {
             symbol = findElement[`level_${this.#state.levelKey}`];
@@ -188,8 +183,7 @@ export class Keyboard {
             return;
           }
         }
-        // console.log(symbol);
-        const newText = text.substring(0, pos + (posShift < 0 ? posShift: 0)) + symbol + text.substring(pos);
+        const newText = text.substring(0, pos + (posShift < 0 ? posShift: 0)) + symbol + text.substring(pos + (postShift > 0 ? postShift: 0));
         this.#state.winEditor.value = newText;
         this.#state.winEditor.selectionStart = pos + posShift;
         this.#state.winEditor.selectionEnd = pos + posShift;
@@ -203,14 +197,12 @@ export class Keyboard {
   }
 
   #resetModifierKeys() {
-    // console.log('resetModifierKeys');
     this.#state.altButton.isActive = false;
     this.#state.controlButton.isActive = false;
     this.#state.shiftButton.isActive = false;
   }
 
   #handleKeyMouseUp(event) {
-    // console.log('handleKeyMouseUp');
     const key = event.target;
     const keyCode = key.dataset.code;
 
@@ -228,7 +220,6 @@ export class Keyboard {
 
 
   #removeActiveClassFromKeys() {
-    // console.log('removeActiveClassFromKeys');
     const keys = this.#state.container.querySelectorAll('.keyboard__key[data-code]:not([data-code="CapsLock"])');
     keys.forEach(key => {
       key.classList.remove('keyboard__key--active');
@@ -237,7 +228,6 @@ export class Keyboard {
   }
 
   #renderComp() {
-    // console.log('renderComp');
     const elComp = utils.createElementWithAttributes('div', 'comp');
     elComp.appendChild(this.#renderMonitor());
     elComp.appendChild(this.#renderKeyboard());
@@ -246,7 +236,6 @@ export class Keyboard {
   }
 
   #renderMonitor() {
-    // console.log('renderMonitor');
     const elMonitor = utils.createElementWithAttributes('div', 'monitor');
     const elMonitorScreen = utils.createElementWithAttributes('div', 'monitor__screen');
     const elWinEditor = utils.createElementWithAttributes('textarea', 'win_editor', { id: 'win_editor'});
@@ -257,7 +246,6 @@ export class Keyboard {
   }
 
   #renderKeyboard() {
-    // console.log('renderKeyboard');
     const elKeyboard = utils.createElementWithAttributes('div', 'keyboard');
     this.#sortKeys();
     let currentRow = 0;
@@ -283,7 +271,6 @@ export class Keyboard {
   }
 
   #createKeyButton(btn) {
-    // console.log('createKeyButton');
     const elKey = utils.createElementWithAttributes('button', 'keyboard__key', {'data-code': btn.code})
     if (btn.level_1) {
       elKey.textContent = btn.level_1;
@@ -298,7 +285,6 @@ export class Keyboard {
   }
 
   #createKeyboardRow(btn) {
-    // console.log('createKeyboardRow');
     const elRowKeys = utils.createElementWithAttributes('div', 'keyboard__row');
     const elKey = this.#createKeyButton(btn);
     elRowKeys.appendChild(elKey);
@@ -306,7 +292,6 @@ export class Keyboard {
   }
 
   #sortKeys() {
-    console.log('sortKeys');
     this.#state.keyboardInfo.keys.sort((a, b) => {
       if (a.row === b.row) {
         return a.pos - b.pos;
@@ -316,21 +301,16 @@ export class Keyboard {
   }
 
   #getKeyboardInfo(lang) {
-    // console.log('getKeyboardInfo');
     return fetch(`./lang/${lang}.json`).then((response) => {
       return response.json();
     });
   }
 
   #handleKeyPressEvent(isActive) {
-    // console.log('handleKeyPressEvent');
-    // console.log(event);
     this.#state.winEditor.focus();
     const keyCode = event.code;
     if (this.#state.modifierKeys.includes(keyCode)) {
       this.#checkKeyboardLanguageToggle(event.shiftKey, event.altKey);
-      console.log(keyCode);
-      console.log(this.#state);
       event.preventDefault();
       switch (keyCode) {
         case 'ControlLeft':
@@ -379,7 +359,6 @@ export class Keyboard {
   }
 
   #checkCapsLockOnKeyPress(event) {
-    // console.log('checkCapsLockOnKeyPress');
     const isCapsLockActive = event.getModifierState('CapsLock');
     if (this.#state.capsLockButton.isActive !== isCapsLockActive) {
       this.#state.capsLockButton.isActive = isCapsLockActive;
@@ -388,7 +367,6 @@ export class Keyboard {
   }
 
   #checkKeyboardLanguageToggle(isShiftKeyActive, isAltKeyActive, isMouse) {
-    // console.log('checkKeyboardLanguageToggle');
     if (this.#state.altButton.isActive && this.#state.shiftButton.isActive &&
        !this.#state.controlButton.isActive && !(isShiftKeyActive && isAltKeyActive)) {
       this.#KeyboardLanguageToggle();
@@ -399,10 +377,8 @@ export class Keyboard {
   }
 
   #KeyboardLanguageToggle() {
-    // console.log('KeyboardLanguageToggle');
     this.#currentIndex = (this.#currentIndex + 1) % this.#listLanguages.length;
     localStorage.setItem ('lang', this.#currentIndex);
-    // this.#resetModifierKeys();
     this.#getKeyboardInfo(this.#listLanguages[this.#currentIndex]).then((keyboardInfo) => {
       this.#state.keyboardInfo = keyboardInfo;
       this.#updateKeyboardKeysText();
@@ -410,7 +386,6 @@ export class Keyboard {
   }
 
   #updateLevelKeyboard() {
-    // console.log('updateLevelKeyboard');
     let newLevelKey = 1;
 
     if (this.#state.altButton.isActive && this.#state.controlButton.isActive && this.#state.keyboardInfo.max_level > 2) {
@@ -427,7 +402,6 @@ export class Keyboard {
   }
 
   #updateKeyboardKeysText() {
-    console.log('updateKeyboardKeysText');
     const elKeys = this.#state.container.querySelectorAll('.keyboard__key');
     for (const elKey of elKeys) {
       const searchCode = elKey.dataset.code;
