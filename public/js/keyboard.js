@@ -92,15 +92,56 @@ export class Keyboard {
   }
 
   #handleKeyMouseDown(event) {
-    // console.log('handleKeyMouseDown');
     const key = event.target;
     const keyCode = key.dataset.code;
     if (keyCode === 'CapsLock') {
       this.#state.capsLockButton.isActive = !this.#state.capsLockButton.isActive;
       this.#updateLevelKeyboard();
-    } else if (keyCode === "ArrowLeft") {
-      this.#state.winEditor.selectionStart -= 1;
-      // this.#state.winEditor.selectionEnd = this.#state.winEditor.selectionStart - 1;
+    } else if (this.#state.arrowsKeys.includes(keyCode)) {
+      if (!key.classList.contains('keyboard__key--active')) {
+        key.classList.add('keyboard__key--active');
+        
+        if (keyCode === "ArrowLeft") {
+          this.#state.winEditor.selectionStart -= 1;
+          this.#state.winEditor.selectionEnd -= 1;
+        } else if (keyCode === "ArrowRight") {
+          this.#state.winEditor.selectionEnd += 1;
+          this.#state.winEditor.selectionStart += 1;
+        } else if (keyCode === "ArrowUp") {
+          
+          const currentPosition = this.#state.winEditor.selectionStart;
+          const currentRow = this.#state.winEditor.value.substr(0, currentPosition).split("\n").length - 1;
+          if (currentRow === 0) {
+            return;
+          }
+          const previousRowEndPosition = this.#state.winEditor.value.lastIndexOf("\n", currentPosition - 2) + 1;
+          const previousRowStartPosition = this.#state.winEditor.value.lastIndexOf("\n", previousRowEndPosition - 2) + 1;
+          const previousRowLength = currentPosition - previousRowEndPosition; 
+          const newPosition = previousRowStartPosition + Math.min(previousRowEndPosition - previousRowStartPosition - 1, previousRowLength);
+          
+          this.#state.winEditor.focus();
+          this.#state.winEditor.setSelectionRange(newPosition, newPosition);
+
+        } else if (keyCode === "ArrowDown") {
+          const currentPosition = this.#state.winEditor.selectionStart;
+          const currentRow = this.#state.winEditor.value.substr(0, currentPosition).split("\n").length - 1;
+          const lines = this.#state.winEditor.value.split("\n");
+          const currentRowLength = lines[currentRow].length;
+          const rowsMax = lines.length;
+
+          const previousRowEndPosition = this.#state.winEditor.value.lastIndexOf("\n", currentPosition - 1) + 1;
+          const positionInRow = currentPosition - previousRowEndPosition
+
+          if (currentRow === rowsMax) {
+            return;
+          }          
+          const nextRowStartPosition = previousRowEndPosition + currentRowLength + 1;
+          const nextRowLength = lines[currentRow + 1].length;
+          const newPosition = Math.min(nextRowStartPosition + positionInRow, nextRowStartPosition + nextRowLength);
+          this.#state.winEditor.focus();
+          this.#state.winEditor.setSelectionRange(newPosition, newPosition);
+        }
+      }
     } else if (this.#state.modifierKeys.includes(keyCode)) {
       switch (keyCode) {
         case 'ControlLeft':
@@ -116,10 +157,6 @@ export class Keyboard {
           this.#state.shiftButton.isActive = !this.#state.shiftButton.isActive;
           break;
       }
-
-      // таймер
-      // this.#checkKeyboardLanguageToggle(event.shiftKey, event.altKey, true);
-      // this.#updateLevelKeyboard();
     } else {
       if (!key.classList.contains('keyboard__key--active')) {
         key.classList.add('keyboard__key--active');
@@ -287,7 +324,7 @@ export class Keyboard {
 
   #handleKeyPressEvent(isActive) {
     // console.log('handleKeyPressEvent');
-    console.log(event);
+    // console.log(event);
     this.#state.winEditor.focus();
     const keyCode = event.code;
     if (this.#state.modifierKeys.includes(keyCode)) {
@@ -310,6 +347,20 @@ export class Keyboard {
           break;
       }
       this.#updateLevelKeyboard();
+    } else if (keyCode === "Tab" && isActive) {
+      event.preventDefault();  
+
+      const pos = this.#state.winEditor.selectionStart;
+      const text = this.#state.winEditor.value;
+      let symbol;
+      let posShift = 4;
+      symbol = "    ";
+      const newText = text.substring(0, pos) + symbol + text.substring(pos);
+      this.#state.winEditor.value = newText;
+      this.#state.winEditor.selectionStart = pos + posShift;
+      this.#state.winEditor.selectionEnd = pos + posShift;
+      this.#state.winEditor.focus();
+
     } else {
       this.#checkCapsLockOnKeyPress(event);
       if (keyCode === "CapsLock") return;
