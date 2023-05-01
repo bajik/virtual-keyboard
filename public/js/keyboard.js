@@ -118,8 +118,8 @@ export class Keyboard {
       }
 
       // таймер
-      this.#checkKeyboardLanguageToggle(event.shiftKey, event.altKey, true);
-      this.#updateLevelKeyboard();
+      // this.#checkKeyboardLanguageToggle(event.shiftKey, event.altKey, true);
+      // this.#updateLevelKeyboard();
     } else {
       if (!key.classList.contains('keyboard__key--active')) {
         key.classList.add('keyboard__key--active');
@@ -177,7 +177,13 @@ export class Keyboard {
     const key = event.target;
     const keyCode = key.dataset.code;
 
-    if (this.#state.modifierKeys.includes(keyCode) || keyCode === 'CapsLock') return;
+    if (keyCode === 'CapsLock') {
+      return;    
+    } else if (this.#state.modifierKeys.includes(keyCode)) {
+      this.#checkKeyboardLanguageToggle(event.shiftKey, event.altKey, true);
+      this.#updateLevelKeyboard();
+      return;
+    } 
 
     key.classList.remove('keyboard__key--active');
     this.#state.winEditor.focus();
